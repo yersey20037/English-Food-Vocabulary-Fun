@@ -11,7 +11,7 @@ interface OptionButtonProps {
 
 const playUISound = (soundUrl: string) => {
   try {
-    new Audio(soundUrl).play();
+    new Audio(soundUrl).play().catch(e => console.warn("Sound play promise rejected:", e));
   } catch (error) {
     console.warn("Sound play prevented:", error);
   }
@@ -51,7 +51,7 @@ const OptionButtonComponent: React.FC<OptionButtonProps> = ({
     case 'FEEDBACK_REVEALED_NEUTRAL':
       buttonStyle = "bg-slate-300 text-slate-500";
       break;
-    default: // Should not happen
+    default: 
       buttonStyle = "bg-slate-400 text-white";
   }
 
@@ -73,7 +73,7 @@ const OptionButtonComponent: React.FC<OptionButtonProps> = ({
       onClick={handleButtonClick}
       onMouseEnter={handleButtonHover}
       disabled={isActuallyDisabled} 
-      className={`w-full p-4 md:p-5 text-lg md:text-xl font-semibold rounded-lg shadow-md transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-opacity-50 ${buttonStyle} ${isActuallyDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
+      className={`w-full p-1.5 sm:p-2 md:p-2.5 text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-opacity-50 ${buttonStyle} ${isActuallyDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
       aria-pressed={ariaPressed}
     >
       {optionText}
@@ -83,3 +83,4 @@ const OptionButtonComponent: React.FC<OptionButtonProps> = ({
 
 const OptionButton = React.memo(OptionButtonComponent);
 export default OptionButton;
+    

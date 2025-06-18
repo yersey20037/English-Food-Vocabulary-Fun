@@ -9,7 +9,7 @@ interface EndScreenProps {
 
 const playUISound = (soundUrl: string) => {
   try {
-    new Audio(soundUrl).play();
+    new Audio(soundUrl).play().catch(e => console.warn("Sound play promise rejected:", e));
   } catch (error) {
     console.warn("Sound play prevented:", error);
   }
@@ -51,25 +51,25 @@ const EndScreenComponent: React.FC<EndScreenProps> = ({ score, totalQuestions, o
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-8 animate-fadeIn">
-      <h2 className="text-4xl md:text-5xl font-bold text-indigo-600 drop-shadow-lg">Game Over! {emoji}</h2>
-      <p className="text-2xl text-slate-700">
+    <div className="flex flex-col items-center justify-center space-y-2 sm:space-y-3 md:space-y-4 animate-fadeIn">
+      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-indigo-600 drop-shadow-lg text-center">Game Over! {emoji}</h2>
+      <p className="text-xs sm:text-sm md:text-base text-slate-700">
         You got <strong className="text-pink-500">{score}</strong> out of <strong className="text-pink-500">{totalQuestions}</strong> correct!
       </p>
-      <p className="text-xl text-slate-600 italic">({percentage}%)</p>
-      <p className="text-2xl text-center text-teal-700 font-medium">{message}</p>
+      <p className="text-[10px] sm:text-xs md:text-sm text-slate-600 italic">({percentage}%)</p>
+      <p className="text-xs sm:text-sm md:text-base text-center text-teal-700 font-medium">{message}</p>
       
        <img 
           src="https://geasacperu.com/imagenes/findeljuego.png" 
           alt="Game Over Celebration" 
-          className="rounded-lg shadow-lg my-4 w-full max-w-xs h-auto" 
+          className="rounded-lg shadow-lg my-2 sm:my-3 w-full max-w-[180px] sm:max-w-[200px] md:max-w-xs h-auto" 
           loading="lazy"
         />
 
       <button
         onClick={handleButtonClick}
         onMouseEnter={handleButtonHover}
-        className="px-8 py-4 bg-orange-500 text-white text-2xl font-semibold rounded-full shadow-lg hover:bg-orange-600 transform hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-300"
+        className="px-4 py-2 bg-orange-500 text-white text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:bg-orange-600 transform hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-300"
       >
         Play Again? 🔁
       </button>
@@ -79,3 +79,4 @@ const EndScreenComponent: React.FC<EndScreenProps> = ({ score, totalQuestions, o
 
 const EndScreen = React.memo(EndScreenComponent);
 export default EndScreen;
+    

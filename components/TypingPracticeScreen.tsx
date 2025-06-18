@@ -12,14 +12,14 @@ interface TypingPracticeScreenProps {
   currentQuestion: number;
   totalQuestions: number;
   proceedToNextQuestion?: () => void;
-  onContentLoaded?: () => void; // Made optional
+  onContentLoaded?: () => void; 
 }
 
 const FALLBACK_IMAGE_URL = 'https://picsum.photos/seed/placeholder_error/400/300';
 
 const playUISound = (soundUrl: string) => {
   try {
-    new Audio(soundUrl).play();
+    new Audio(soundUrl).play().catch(e => console.warn("Sound play promise rejected:", e));
   } catch (error) {
     console.warn("Sound play prevented:", error);
   }
@@ -99,22 +99,22 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col items-center space-y-4 md:space-y-6 animate-fadeIn">
+    <div className="w-full flex flex-col items-center space-y-2 sm:space-y-2.5 md:space-y-3 animate-fadeIn">
       <div className="w-full flex justify-between items-center text-slate-700 font-semibold">
-        <span className="text-lg bg-sky-200 px-3 py-1 rounded-full shadow">Score: {score}</span>
-        <span className="text-lg bg-amber-200 px-3 py-1 rounded-full shadow">Question: {currentQuestion} / {totalQuestions}</span>
+        <span className="text-[10px] sm:text-xs md:text-sm bg-sky-200 px-2 sm:px-3 py-1 rounded-full shadow">Score: {score}</span>
+        <span className="text-[10px] sm:text-xs md:text-sm bg-amber-200 px-2 sm:px-3 py-1 rounded-full shadow">Question: {currentQuestion} / {totalQuestions}</span>
       </div>
 
-      <h2 className="text-3xl md:text-4xl font-bold text-purple-600 drop-shadow-md">
+      <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-purple-600 drop-shadow-md text-center">
         Type the word:
       </h2>
 
-      <div className="relative w-full max-w-sm h-52 md:h-64 rounded-xl shadow-2xl overflow-hidden group bg-slate-200 flex items-center justify-center">
+      <div className="relative w-full max-w-[280px] sm:max-w-xs h-28 sm:h-32 md:h-36 lg:h-40 rounded-xl shadow-2xl overflow-hidden group bg-slate-200 flex items-center justify-center">
         {imageStatus === 'loading' && (
-          <p className="text-slate-500 animate-pulse">Image loading...</p>
+          <p className="text-xs sm:text-sm text-slate-500 animate-pulse">Image loading...</p>
         )}
         {imageStatus === 'error' && (
-           <p className="text-red-500">Could not load image.</p>
+           <p className="text-xs sm:text-sm text-red-500">Could not load image.</p>
         )}
         <img
           src={currentImageSrc}
@@ -129,7 +129,7 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
       </div>
 
       {!showFeedbackGlobal && (
-        <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col items-center space-y-3 mt-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col items-center space-y-2 sm:space-y-3 mt-1.5 sm:mt-2">
           <label htmlFor="typing-input" className="sr-only">Type the food name</label>
           <input
             id="typing-input"
@@ -138,14 +138,15 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
             value={typedWord}
             onChange={handleInputChange}
             placeholder="Type here..."
-            className="p-3 border-2 border-sky-300 rounded-lg w-full text-lg shadow-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+            className="p-1 text-[10px] sm:text-xs border-2 border-sky-300 rounded-lg w-full shadow-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
             aria-label="Type the food name"
             disabled={areControlsDisabled}
+            autoComplete="off"
           />
           <button
             type="submit"
             onMouseEnter={() => handleButtonHover(isCheckButtonDisabled)}
-            className="px-8 py-3 bg-yellow-400 hover:bg-yellow-500 text-yellow-800 font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-1 bg-yellow-400 hover:bg-yellow-500 text-yellow-800 text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isCheckButtonDisabled}
           >
             Check ✅
@@ -154,14 +155,14 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
       )}
       
       {showFeedbackGlobal && isAnswerCorrect !== null && (
-        <div className="mt-4 w-full flex flex-col items-center space-y-4">
+        <div className="mt-1.5 sm:mt-2 w-full flex flex-col items-center space-y-2 sm:space-y-3">
             <FeedbackIndicator isCorrect={isAnswerCorrect} correctAnswer={foodItem.name_en} />
             {proceedToNextQuestion && (
                  <button
                     type="button"
                     onClick={handleNextWordClick}
                     onMouseEnter={() => handleButtonHover(false)}
-                    className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300"
+                    className="px-4 py-1 bg-green-500 hover:bg-green-600 text-white text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300"
                   >
                     Next Word 🚀
                   </button>
@@ -173,3 +174,4 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
 };
 
 export default TypingPracticeScreen;
+    

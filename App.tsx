@@ -13,9 +13,9 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 const FullPageLoader: React.FC = () => (
-  <div className="flex flex-col items-center justify-center h-full w-full space-y-4">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-sky-500"></div>
-    <p className="text-xl text-sky-600 font-semibold">Loading your next challenge...</p>
+  <div className="flex flex-col items-center justify-center h-full w-full space-y-3 sm:space-y-4">
+    <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-sky-500"></div>
+    <p className="text-lg sm:text-xl text-sky-600 font-semibold">Loading your next challenge...</p>
   </div>
 );
 
@@ -90,7 +90,6 @@ const App: React.FC = () => {
     if (currentQuestionIndex < shuffledFoodItems.length - 1) {
       setIsPageLoading(true); 
       setCurrentQuestionIndex(prevIndex => prevIndex + 1);
-      // Reset interaction states for the new question
       setSelectedAnswer(null);
       setIsAnswerCorrect(null);
       if (gameMode === GameMode.MULTIPLE_CHOICE) {
@@ -145,12 +144,12 @@ const App: React.FC = () => {
         if (!currentFoodItem) return <FullPageLoader />; 
         return (
           <MultipleChoiceScreen
-            key={currentFoodItem.id} // Ensures re-mount on new question
+            key={currentFoodItem.id} 
             foodItem={currentFoodItem}
             options={currentOptions}
             onSelectOption={handleMCQAnswer}
-            selectedAnswer={selectedAnswer} // Pass null initially for new question
-            isAnswerCorrect={null}       // Pass null initially for new question
+            selectedAnswer={selectedAnswer} 
+            isAnswerCorrect={null}       
             showFeedback={false} 
             score={score}
             currentQuestion={currentQuestionIndex + 1}
@@ -162,10 +161,10 @@ const App: React.FC = () => {
         if (!currentFoodItem) return <FullPageLoader />;
         return (
           <TypingPracticeScreen
-            key={currentFoodItem.id} // Ensures re-mount on new question
+            key={currentFoodItem.id} 
             foodItem={currentFoodItem}
             onAttempt={handleTypingAttempt}
-            isAnswerCorrect={null} // Pass null initially for new question
+            isAnswerCorrect={null} 
             showFeedbackGlobal={false} 
             score={score}
             currentQuestion={currentQuestionIndex + 1}
@@ -175,13 +174,10 @@ const App: React.FC = () => {
         );
       case GameState.FEEDBACK:
         if (!currentFoodItem) return <FullPageLoader />; 
-        // Key for feedback screen can be same as playing, as item doesn't change
-        // or add a suffix if specific re-mount for feedback is ever needed.
-        // For now, no key change means it updates, which is fine for feedback.
         if (gameMode === GameMode.MULTIPLE_CHOICE) {
           return (
             <MultipleChoiceScreen
-              key={currentFoodItem.id + "-feedback"} // Differentiate key if needed, or keep same
+              key={currentFoodItem.id + "-feedback"} 
               foodItem={currentFoodItem}
               options={currentOptions}
               onSelectOption={() => {}} 
@@ -198,7 +194,7 @@ const App: React.FC = () => {
         } else if (gameMode === GameMode.TYPING_PRACTICE) {
            return (
             <TypingPracticeScreen
-              key={currentFoodItem.id + "-feedback"} // Differentiate key if needed
+              key={currentFoodItem.id + "-feedback"} 
               foodItem={currentFoodItem}
               onAttempt={() => {}} 
               isAnswerCorrect={isAnswerCorrect}
@@ -226,7 +222,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-xl p-6 md:p-10 text-center min-h-[600px] w-full flex flex-col justify-center items-center transform transition-all duration-300 hover:scale-105 relative">
+    <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-xl p-4 sm:p-5 md:p-6 lg:p-8 text-center min-h-[500px] sm:min-h-[550px] md:min-h-[600px] w-full flex flex-col justify-center items-center transform transition-all duration-300 hover:scale-105 relative">
       {isPageLoading && (
         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-xl">
           <FullPageLoader />
@@ -238,3 +234,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+    
