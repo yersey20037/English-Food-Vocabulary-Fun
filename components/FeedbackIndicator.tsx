@@ -6,19 +6,24 @@ interface FeedbackIndicatorProps {
   correctAnswer: string;
 }
 
+// This component is not actively used by MultipleChoiceScreen or TypingPracticeScreen
+// as feedback messages are now handled by the FeedbackModal.
+// It's kept here in case a need for a simple inline indicator arises elsewhere,
+// or it can be safely removed if no longer needed.
+
 const FeedbackIndicatorComponent: React.FC<FeedbackIndicatorProps> = ({ isCorrect, correctAnswer }) => {
   if (isCorrect) {
     return (
-      <div className="mt-2 sm:mt-3 p-2 sm:p-3 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 text-center">
-        <h3 className="text-lg sm:text-xl md:text-2xl font-bold">Awesome! 🎉</h3>
-        <p className="text-sm sm:text-base">That's correct!</p>
+      <div className="alert alert-success text-center p-2 p-sm-3 w-100" role="alert">
+        <h4 className="alert-heading h5 fw-bold">Awesome! 🎉</h4>
+        <p className="mb-0 small">That's correct!</p>
       </div>
     );
   } else {
     return (
-      <div className="mt-2 sm:mt-3 p-2 sm:p-3 rounded-lg bg-red-100 border-2 border-red-500 text-red-700 text-center">
-        <h3 className="text-lg sm:text-xl md:text-2xl font-bold">Oops! 🙈</h3>
-        <p className="text-sm sm:text-base">Not quite. The correct answer is <strong className="font-semibold">{correctAnswer}</strong>.</p>
+      <div className="alert alert-danger text-center p-2 p-sm-3 w-100" role="alert">
+        <h4 className="alert-heading h5 fw-bold">Oops! 🙈</h4>
+        <p className="mb-0 small">Not quite. The correct answer is <strong className="fw-bold">{correctAnswer}</strong>.</p>
       </div>
     );
   }
@@ -26,4 +31,3 @@ const FeedbackIndicatorComponent: React.FC<FeedbackIndicatorProps> = ({ isCorrec
 
 const FeedbackIndicator = React.memo(FeedbackIndicatorComponent);
 export default FeedbackIndicator;
-    

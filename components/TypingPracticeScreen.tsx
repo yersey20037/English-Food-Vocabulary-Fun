@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { FoodItem } from '../types';
-import FeedbackIndicator from './FeedbackIndicator';
+// FeedbackIndicator is removed as modal handles this
 
 interface TypingPracticeScreenProps {
   foodItem: FoodItem;
   onAttempt: (typedWord: string) => void;
-  isAnswerCorrect: boolean | null;
+  // isAnswerCorrect: boolean | null; // Removed
   showFeedbackGlobal: boolean;
   score: number;
   currentQuestion: number;
@@ -28,7 +28,7 @@ const playUISound = (soundUrl: string) => {
 const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
   foodItem,
   onAttempt,
-  isAnswerCorrect,
+  // isAnswerCorrect, // Removed
   showFeedbackGlobal,
   score,
   currentQuestion,
@@ -45,7 +45,8 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
     setImageStatus('loading');
     setCurrentImageSrc(foodItem.imageUrl);
     setTypedWord(''); 
-  }, [foodItem.imageUrl]); 
+  }, [foodItem.imageUrl, foodItem.id]);
+
 
   useEffect(() => {
     if (imageStatus === 'loaded' || imageStatus === 'error') {
@@ -78,7 +79,7 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (areControlsDisabled || !typedWord.trim()) return;
-    playUISound('https://geasacperu.com/imagenes/click.aac');
+    playUISound('https://geasacperu.com/imagenes/click.aac'); // Sound for submitting
     onAttempt(typedWord.trim());
   };
   
@@ -99,38 +100,45 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col items-center space-y-2 sm:space-y-2.5 md:space-y-3 animate-fadeIn">
-      <div className="w-full flex justify-between items-center text-slate-700 font-semibold">
-        <span className="text-[10px] sm:text-xs md:text-sm bg-sky-200 px-2 sm:px-3 py-1 rounded-full shadow">Score: {score}</span>
-        <span className="text-[10px] sm:text-xs md:text-sm bg-amber-200 px-2 sm:px-3 py-1 rounded-full shadow">Question: {currentQuestion} / {totalQuestions}</span>
+    <div className="w-100 d-flex flex-column align-items-center gap-2 gap-sm-3 animate-fadeIn">
+      <div className="row w-100 fw-semibold align-items-center">
+        <div className="col text-start">
+          <span className="badge bg-info text-dark fs-6 px-2 px-sm-3 py-1 shadow-sm">Score: {score}</span>
+        </div>
+        <div className="col text-end">
+          <span className="badge bg-warning text-dark fs-6 px-2 px-sm-3 py-1 shadow-sm">Question: {currentQuestion} / {totalQuestions}</span>
+        </div>
       </div>
 
-      <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-purple-600 drop-shadow-md text-center">
+      <h2 className="h4 fw-bold text-secondary text-center mt-2">
         Type the word:
       </h2>
 
-      <div className="relative w-full max-w-[280px] sm:max-w-xs h-28 sm:h-32 md:h-36 lg:h-40 rounded-xl shadow-2xl overflow-hidden group bg-slate-200 flex items-center justify-center">
+      <div 
+        className="position-relative w-100 rounded shadow-lg overflow-hidden bg-light d-flex align-items-center justify-content-center mx-auto"
+        style={{maxWidth: '320px', height: '180px'}}
+      >
         {imageStatus === 'loading' && (
-          <p className="text-xs sm:text-sm text-slate-500 animate-pulse">Image loading...</p>
+           <div className="spinner-grow text-secondary" role="status">
+             <span className="visually-hidden">Loading...</span>
+           </div>
         )}
         {imageStatus === 'error' && (
-           <p className="text-xs sm:text-sm text-red-500">Could not load image.</p>
+           <p className="small text-danger m-0">Could not load image.</p>
         )}
         <img
           src={currentImageSrc}
           alt={foodItem.name_en}
-          className={`w-full h-full object-contain transform transition-opacity duration-300 group-hover:scale-110 ${imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
+          className={`img-fluid object-fit-contain h-100 transition-opacity duration-300 ${imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
           onLoad={handleImageLoad}
           onError={handleImageError}
-          loading="lazy"
           key={foodItem.id} 
         />
-        {imageStatus === 'loaded' && <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>}
       </div>
 
       {!showFeedbackGlobal && (
-        <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col items-center space-y-2 sm:space-y-3 mt-1.5 sm:mt-2">
-          <label htmlFor="typing-input" className="sr-only">Type the food name</label>
+        <form onSubmit={handleSubmit} className="w-100 mx-auto d-flex flex-column align-items-center gap-2 mt-2" style={{maxWidth: '320px'}}>
+          <label htmlFor="typing-input" className="visually-hidden">Type the food name</label>
           <input
             id="typing-input"
             ref={inputRef}
@@ -138,15 +146,16 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
             value={typedWord}
             onChange={handleInputChange}
             placeholder="Type here..."
-            className="p-1 text-[10px] sm:text-xs border-2 border-sky-300 rounded-lg w-full shadow-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+            className="form-control form-control-sm shadow-sm w-100" 
             aria-label="Type the food name"
             disabled={areControlsDisabled}
             autoComplete="off"
+            spellCheck="false"
           />
           <button
             type="submit"
             onMouseEnter={() => handleButtonHover(isCheckButtonDisabled)}
-            className="px-4 py-1 bg-yellow-400 hover:bg-yellow-500 text-yellow-800 text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn btn-warning btn-sm shadow-sm text-dark"
             disabled={isCheckButtonDisabled}
           >
             Check ✅
@@ -154,19 +163,17 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
         </form>
       )}
       
-      {showFeedbackGlobal && isAnswerCorrect !== null && (
-        <div className="mt-1.5 sm:mt-2 w-full flex flex-col items-center space-y-2 sm:space-y-3">
-            <FeedbackIndicator isCorrect={isAnswerCorrect} correctAnswer={foodItem.name_en} />
-            {proceedToNextQuestion && (
-                 <button
-                    type="button"
-                    onClick={handleNextWordClick}
-                    onMouseEnter={() => handleButtonHover(false)}
-                    className="px-4 py-1 bg-green-500 hover:bg-green-600 text-white text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300"
-                  >
-                    Next Word 🚀
-                  </button>
-            )}
+      {showFeedbackGlobal && proceedToNextQuestion && (
+        <div className="mt-3 w-100 mx-auto d-flex flex-column align-items-center gap-2" style={{maxWidth: '320px'}}>
+            {/* FeedbackIndicator removed, modal shows this info */}
+            <button
+                type="button"
+                onClick={handleNextWordClick}
+                onMouseEnter={() => handleButtonHover(false)}
+                className="btn btn-success shadow-sm btn-lg" // Made button larger
+            >
+                Next Word 🚀
+            </button>
         </div>
       )}
     </div>
@@ -174,4 +181,3 @@ const TypingPracticeScreen: React.FC<TypingPracticeScreenProps> = ({
 };
 
 export default TypingPracticeScreen;
-    

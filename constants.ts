@@ -21,4 +21,4 @@ export const FOOD_ITEMS_DATA: FoodItem[] = [
 ];
 
 export const NUMBER_OF_OPTIONS = 4; // For multiple choice
-export const FEEDBACK_DELAY_MS = 1500; // 1.5 seconds for MCQ feedback display (less critical now for auto-advance)
+export const FEEDBACK_DELAY_MS = 3000; // 3 seconds for Toast visibility

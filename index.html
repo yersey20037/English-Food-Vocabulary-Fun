@@ -3,26 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food Vocabulary Fun</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Vocabulary Party</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
       body {
         font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; /* Kid-friendly font stack */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #e0f7fa; /* Light cyan, kid-friendly */
       }
-      /* Custom scrollbar for a bit more fun */
-      ::-webkit-scrollbar {
-        width: 12px;
+      /* Custom animation if needed, assuming animate-fadeIn is defined elsewhere or will be */
+      .animate-fadeIn {
+        animation: fadeInAnimation 0.5s ease-in-out;
       }
-      ::-webkit-scrollbar-track {
-        background: #f0f0f0;
-        border-radius: 10px;
+      @keyframes fadeInAnimation {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-      ::-webkit-scrollbar-thumb {
-        background: #4ade80; /* Tailwind green-400 */
-        border-radius: 10px;
+      .object-fit-contain {
+        object-fit: contain;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #22c55e; /* Tailwind green-500 */
+
+      /* Ensure modal backdrop is styled if needed, though Bootstrap usually handles this */
+      .modal-backdrop {
+        background-color: rgba(0,0,0,0.3); /* Softer backdrop for kids */
       }
     </style>
   <script type="importmap">
@@ -38,8 +45,10 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-gradient-to-br from-sky-300 via-lime-300 to-yellow-300 min-h-screen flex items-center justify-center p-4">
-    <div id="root" class="w-full max-w-2xl"></div>
+  <body class="p-2 p-sm-3">
+    <div id="root" class="w-100"></div>
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="module" src="https://esm.sh/gh/yersey20037/English-Food-Vocabulary-Fun@main/index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>

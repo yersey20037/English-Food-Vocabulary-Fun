@@ -23,37 +23,42 @@ const OptionButtonComponent: React.FC<OptionButtonProps> = ({
   displayStatus,
   isActuallyDisabled,
 }) => {
-  let buttonStyle = "";
+  let buttonClasses = "btn w-100 fw-semibold shadow-sm text-break p-2"; // Base classes
   let ariaPressed: boolean | undefined = undefined;
 
   switch (displayStatus) {
     case 'DEFAULT':
-      buttonStyle = "bg-sky-500 hover:bg-sky-600 text-white";
+      buttonClasses += " btn-outline-primary";
       break;
     case 'DISABLED_LOADING':
-      buttonStyle = "bg-slate-300 text-slate-500 cursor-not-allowed";
+      buttonClasses += " btn-light text-muted";
       break;
     case 'SELECTED_PENDING_FEEDBACK':
-      buttonStyle = "bg-sky-700 text-white ring-4 ring-sky-300";
+      buttonClasses += " btn-primary active"; // Bootstrap 'active' can show selection
       ariaPressed = true;
       break;
     case 'FEEDBACK_CORRECT_SELECTED':
-      buttonStyle = "bg-green-500 text-white ring-4 ring-green-300";
+      buttonClasses += " btn-success active";
       ariaPressed = true;
       break;
     case 'FEEDBACK_INCORRECT_SELECTED':
-      buttonStyle = "bg-red-500 text-white ring-4 ring-red-300";
+      buttonClasses += " btn-danger active";
       ariaPressed = true;
       break;
     case 'FEEDBACK_REVEALED_CORRECT':
-      buttonStyle = "bg-green-300 text-green-700 border-2 border-green-500";
+      buttonClasses += " btn-outline-success border-2"; // Keep border emphasis
       break;
     case 'FEEDBACK_REVEALED_NEUTRAL':
-      buttonStyle = "bg-slate-300 text-slate-500";
+      buttonClasses += " btn-light text-muted";
       break;
     default: 
-      buttonStyle = "bg-slate-400 text-white";
+      buttonClasses += " btn-secondary";
   }
+
+  if (isActuallyDisabled && displayStatus !== 'DISABLED_LOADING') {
+      buttonClasses += " disabled"; 
+  }
+
 
   const handleButtonClick = () => {
     if (!isActuallyDisabled) {
@@ -70,11 +75,14 @@ const OptionButtonComponent: React.FC<OptionButtonProps> = ({
 
   return (
     <button
+      type="button"
       onClick={handleButtonClick}
       onMouseEnter={handleButtonHover}
       disabled={isActuallyDisabled} 
-      className={`w-full p-1.5 sm:p-2 md:p-2.5 text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-opacity-50 ${buttonStyle} ${isActuallyDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
+      className={buttonClasses}
       aria-pressed={ariaPressed}
+      // Ensure text is small enough but readable
+      style={{ fontSize: 'clamp(0.65rem, 2.5vw, 0.8rem)'}} 
     >
       {optionText}
     </button>
@@ -83,4 +91,3 @@ const OptionButtonComponent: React.FC<OptionButtonProps> = ({
 
 const OptionButton = React.memo(OptionButtonComponent);
 export default OptionButton;
-    

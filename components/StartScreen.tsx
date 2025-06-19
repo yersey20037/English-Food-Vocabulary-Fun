@@ -19,27 +19,23 @@ const StartScreenComponent: React.FC<StartScreenProps> = ({ onStart }) => {
     onStart();
   };
 
-  // Hover sound intentionally removed for the very first button to avoid autoplay errors
-  // const handleButtonHover = () => {
-  //   playUISound('https://geasacperu.com/imagenes/recorrer.aac');
-  // };
-
   return (
-    <div className="flex flex-col items-center justify-center space-y-3 sm:space-y-4 md:space-y-5 animate-fadeIn">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-sky-600 drop-shadow-lg text-center">Learn Food Words!</h1>
-      <p className="text-xs sm:text-sm md:text-base text-slate-700 text-center">
+    <div className="d-flex flex-column align-items-center justify-content-center text-center gap-3 gap-sm-4 animate-fadeIn">
+      <h1 className="display-4 fw-bold text-primary">Learn Food Words!</h1>
+      <p className="fs-6 text-muted">
         Let's learn English words for delicious foods!
       </p>
       <img 
         src="https://geasacperu.com/imagenes/gameplay.jpeg" 
         alt="Food vocabulary game play" 
-        className="rounded-lg shadow-lg w-full max-w-[180px] sm:max-w-[200px] md:max-w-xs h-auto" 
+        className="img-fluid rounded shadow w-75 mx-auto"
         loading="lazy"
+        style={{maxWidth: '220px'}}
       />
       <button
         onClick={handleButtonClick}
-        // onMouseEnter={handleButtonHover} 
-        className="px-4 py-2 bg-green-500 text-white text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:bg-green-600 transform hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300"
+        className="btn btn-success btn-lg rounded-pill shadow px-4 py-2"
+        aria-label="Let's Play!"
       >
         Let's Play! 🎉
       </button>
@@ -49,4 +45,3 @@ const StartScreenComponent: React.FC<StartScreenProps> = ({ onStart }) => {
 
 const StartScreen = React.memo(StartScreenComponent);
 export default StartScreen;
-    

@@ -1,21 +1,32 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameState, FoodItem, GameMode } from './types';
-import { FOOD_ITEMS_DATA, NUMBER_OF_OPTIONS } from './constants';
+import { FOOD_ITEMS_DATA, NUMBER_OF_OPTIONS, FEEDBACK_DELAY_MS } from './constants';
 import StartScreen from './components/StartScreen';
 import ModeSelectScreen from './components/ModeSelectScreen';
 import MultipleChoiceScreen from './components/MultipleChoiceScreen';
 import TypingPracticeScreen from './components/TypingPracticeScreen';
 import EndScreen from './components/EndScreen';
+import FeedbackToast from './components/FeedbackToast'; // Import the new toast
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
+const playUISound = (soundUrl: string) => {
+  try {
+    new Audio(soundUrl).play().catch(e => console.warn("Sound play promise rejected:", e));
+  } catch (error) {
+    console.warn("Sound play prevented:", error);
+  }
+};
+
 const FullPageLoader: React.FC = () => (
-  <div className="flex flex-col items-center justify-center h-full w-full space-y-3 sm:space-y-4">
-    <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-sky-500"></div>
-    <p className="text-lg sm:text-xl text-sky-600 font-semibold">Loading your next challenge...</p>
+  <div className="d-flex flex-column align-items-center justify-content-center h-100 w-100 gap-3">
+    <div className="spinner-border text-primary" role="status" style={{width: '3rem', height: '3rem'}}>
+      <span className="visually-hidden">Loading...</span>
+    </div>
+    <p className="fs-5 text-primary fw-semibold">Loading your next challenge...</p>
   </div>
 );
 
@@ -27,8 +38,15 @@ const App: React.FC = () => {
   const [currentOptions, setCurrentOptions] = useState<string[]>([]);
   const [score, setScore] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null); // Still useful for game logic
   const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
+
+  // State for Feedback Toast
+  const [isFeedbackToastVisible, setIsFeedbackToastVisible] = useState<boolean>(false);
+  const [feedbackToastTitle, setFeedbackToastTitle] = useState<string>('');
+  const [feedbackToastBody, setFeedbackToastBody] = useState<React.ReactNode>('');
+  const [toastIsCorrect, setToastIsCorrect] = useState<boolean | null>(null);
+
 
   const currentFoodItem = shuffledFoodItems[currentQuestionIndex];
 
@@ -54,7 +72,7 @@ const App: React.FC = () => {
     if (index >= shuffledFoodItems.length) {
       return;
     }
-    setIsAnswerCorrect(null); // Reset feedback for typing
+    setIsAnswerCorrect(null); 
   }, [shuffledFoodItems]);
 
   useEffect(() => {
@@ -86,7 +104,12 @@ const App: React.FC = () => {
     }
   };
   
+  const handleCloseFeedbackToast = () => {
+    setIsFeedbackToastVisible(false);
+  };
+
   const proceedToNextQuestion = useCallback(() => {
+    handleCloseFeedbackToast(); // Close toast before proceeding
     if (currentQuestionIndex < shuffledFoodItems.length - 1) {
       setIsPageLoading(true); 
       setCurrentQuestionIndex(prevIndex => prevIndex + 1);
@@ -108,10 +131,20 @@ const App: React.FC = () => {
 
     setSelectedAnswer(answer);
     const correct = answer === currentFoodItem.name_en;
-    setIsAnswerCorrect(correct);
+    setIsAnswerCorrect(correct); // This state can still be useful for immediate logic if needed
+    
     if (correct) {
       setScore(prevScore => prevScore + 1);
+      playUISound('https://geasacperu.com/imagenes/correct.aac'); 
+      setFeedbackToastTitle("Awesome! 🎉");
+      setFeedbackToastBody("That's correct!");
+    } else {
+      playUISound('https://geasacperu.com/imagenes/incorrect.aac'); 
+      setFeedbackToastTitle("Oops! 🙈");
+      setFeedbackToastBody(<>Not quite. The correct answer is <strong>{currentFoodItem.name_en}</strong>.</>);
     }
+    setToastIsCorrect(correct);
+    setIsFeedbackToastVisible(true);
     setGameState(GameState.FEEDBACK);
   };
 
@@ -120,14 +153,25 @@ const App: React.FC = () => {
 
     const correct = typedWord.trim().toLowerCase() === currentFoodItem.name_en.toLowerCase();
     setIsAnswerCorrect(correct);
+
     if (correct) {
       setScore(prevScore => prevScore + 1);
+      playUISound('https://geasacperu.com/imagenes/correct.aac');
+      setFeedbackToastTitle("Awesome! 🎉");
+      setFeedbackToastBody("That's correct!");
+    } else {
+      playUISound('https://geasacperu.com/imagenes/incorrect.aac');
+      setFeedbackToastTitle("Oops! 🙈");
+      setFeedbackToastBody(<>Not quite. The correct answer is <strong>{currentFoodItem.name_en}</strong>.</>);
     }
+    setToastIsCorrect(correct);
+    setIsFeedbackToastVisible(true);
     setGameState(GameState.FEEDBACK); 
   };
 
 
   const handlePlayAgain = () => {
+    handleCloseFeedbackToast(); // Ensure toast is closed
     setGameMode(null);
     setGameState(GameState.MODE_SELECTION);
     setIsPageLoading(false);
@@ -148,8 +192,7 @@ const App: React.FC = () => {
             foodItem={currentFoodItem}
             options={currentOptions}
             onSelectOption={handleMCQAnswer}
-            selectedAnswer={selectedAnswer} 
-            isAnswerCorrect={null}       
+            selectedAnswer={selectedAnswer}      
             showFeedback={false} 
             score={score}
             currentQuestion={currentQuestionIndex + 1}
@@ -164,7 +207,6 @@ const App: React.FC = () => {
             key={currentFoodItem.id} 
             foodItem={currentFoodItem}
             onAttempt={handleTypingAttempt}
-            isAnswerCorrect={null} 
             showFeedbackGlobal={false} 
             score={score}
             currentQuestion={currentQuestionIndex + 1}
@@ -179,11 +221,10 @@ const App: React.FC = () => {
             <MultipleChoiceScreen
               key={currentFoodItem.id + "-feedback"} 
               foodItem={currentFoodItem}
-              options={currentOptions}
+              options={currentOptions} 
               onSelectOption={() => {}} 
               selectedAnswer={selectedAnswer}
-              isAnswerCorrect={isAnswerCorrect}
-              showFeedback={true}
+              showFeedback={true} 
               score={score}
               currentQuestion={currentQuestionIndex + 1}
               totalQuestions={shuffledFoodItems.length}
@@ -197,7 +238,6 @@ const App: React.FC = () => {
               key={currentFoodItem.id + "-feedback"} 
               foodItem={currentFoodItem}
               onAttempt={() => {}} 
-              isAnswerCorrect={isAnswerCorrect}
               showFeedbackGlobal={true} 
               score={score}
               currentQuestion={currentQuestionIndex + 1}
@@ -222,16 +262,48 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-xl p-4 sm:p-5 md:p-6 lg:p-8 text-center min-h-[500px] sm:min-h-[550px] md:min-h-[600px] w-full flex flex-col justify-center items-center transform transition-all duration-300 hover:scale-105 relative">
-      {isPageLoading && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-xl">
-          <FullPageLoader />
-        </div>
-      )}
-      {renderScreen()}
-    </div>
+    <>
+      <div 
+          className="card shadow-lg text-center p-3 p-sm-4 p-md-5 mx-auto" 
+          style={{
+              width: '100%',
+              maxWidth: '650px', 
+              minHeight: 'auto', 
+              height: 'auto', 
+              backgroundColor: 'rgba(255, 255, 255, 0.90)' 
+          }}
+      >
+          <div className="card-body d-flex flex-column justify-content-center align-items-center position-relative">
+              {isPageLoading && (
+                  <div 
+                      className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded" 
+                      style={{backgroundColor: 'rgba(255, 255, 255, 0.95)', zIndex: 10}}
+                  >
+                      <FullPageLoader />
+                  </div>
+              )}
+              <div className="w-100">
+                {renderScreen()}
+              </div>
+          </div>
+      </div>
+
+      {/* Toast Container for positioning */}
+      <div 
+        className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
+        style={{zIndex: 1100}} /* Ensure toast is above other elements */
+      >
+        <FeedbackToast
+          show={isFeedbackToastVisible}
+          onClose={handleCloseFeedbackToast}
+          title={feedbackToastTitle}
+          body={feedbackToastBody}
+          isCorrect={toastIsCorrect}
+          delay={FEEDBACK_DELAY_MS}
+        />
+      </div>
+    </>
   );
 };
 
 export default App;
-    

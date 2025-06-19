@@ -25,17 +25,17 @@ const ModeSelectScreenComponent: React.FC<ModeSelectScreenProps> = ({ onSelectMo
   };
   
   return (
-    <div className="flex flex-col items-center justify-center space-y-3 sm:space-y-4 md:space-y-5 animate-fadeIn">
-      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-sky-600 drop-shadow-lg text-center">Choose Your Adventure</h1>
-      <p className="text-xs sm:text-sm md:text-base text-slate-700 text-center">
+    <div className="d-flex flex-column align-items-center justify-content-center text-center gap-3 gap-sm-4 animate-fadeIn">
+      <h1 className="display-5 fw-bold text-primary">Choose Your Adventure</h1>
+      <p className="fs-5 text-muted">
         How do you want to learn today?
       </p>
       
-      <div className="flex flex-col md:flex-row space-y-2 sm:space-y-3 md:space-y-0 md:space-x-3 mt-2 sm:mt-3">
+      <div className="d-grid gap-2 d-md-flex justify-content-md-center mt-2">
         <button
           onClick={() => handleModeButtonClick(GameMode.MULTIPLE_CHOICE)}
           onMouseEnter={handleButtonHover}
-          className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white text-xs sm:text-sm md:text-base font-semibold rounded-lg shadow-lg hover:bg-blue-600 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          className="btn btn-primary btn-lg shadow"
           aria-label="Play Multiple Choice mode"
         >
           Multiple Choice 🤔
@@ -43,7 +43,7 @@ const ModeSelectScreenComponent: React.FC<ModeSelectScreenProps> = ({ onSelectMo
         <button
           onClick={() => handleModeButtonClick(GameMode.TYPING_PRACTICE)}
           onMouseEnter={handleButtonHover}
-          className="w-full md:w-auto px-4 py-2 bg-teal-500 text-white text-xs sm:text-sm md:text-base font-semibold rounded-lg shadow-lg hover:bg-teal-600 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-teal-300"
+          className="btn btn-info btn-lg shadow text-white"
           aria-label="Play Type the Word mode"
         >
           Type the Word ⌨️
@@ -55,4 +55,3 @@ const ModeSelectScreenComponent: React.FC<ModeSelectScreenProps> = ({ onSelectMo
 
 const ModeSelectScreen = React.memo(ModeSelectScreenComponent);
 export default ModeSelectScreen;
-    

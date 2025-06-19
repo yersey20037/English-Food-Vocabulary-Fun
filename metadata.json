@@ -1,6 +1,7 @@
 
 {
-  "name": "English Food Vocabulary Fun",
+  "name": "Vocabulary Party",
   "description": "A fun and interactive web application for children to practice English vocabulary related to food items, with images, multiple-choice questions, and typing practice.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "prompt": ""
 }

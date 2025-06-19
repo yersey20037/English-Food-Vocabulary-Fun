@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { FoodItem, OptionButtonDisplayStatus } from '../types';
 import OptionButton from './OptionButton';
-import FeedbackIndicator from './FeedbackIndicator';
+// FeedbackIndicator is removed as modal handles this
 
 interface MultipleChoiceScreenProps {
   foodItem: FoodItem;
   options: string[];
   onSelectOption: (option: string) => void;
   selectedAnswer: string | null;
-  isAnswerCorrect: boolean | null;
+  // isAnswerCorrect prop is no longer needed here as modal displays feedback text
   showFeedback: boolean; 
   score: number;
   currentQuestion: number;
@@ -33,7 +33,7 @@ const MultipleChoiceScreen: React.FC<MultipleChoiceScreenProps> = ({
   options,
   onSelectOption,
   selectedAnswer,
-  isAnswerCorrect,
+  // isAnswerCorrect, // Removed
   showFeedback,
   score,
   currentQuestion,
@@ -47,7 +47,7 @@ const MultipleChoiceScreen: React.FC<MultipleChoiceScreenProps> = ({
   useEffect(() => {
     setImageStatus('loading');
     setCurrentImageSrc(foodItem.imageUrl);
-  }, [foodItem.imageUrl]);
+  }, [foodItem.imageUrl, foodItem.id]); 
 
   useEffect(() => {
     if (imageStatus === 'loaded' || imageStatus === 'error') {
@@ -68,31 +68,26 @@ const MultipleChoiceScreen: React.FC<MultipleChoiceScreenProps> = ({
   };
 
   const getOptionDisplayStatus = (optionText: string): OptionButtonDisplayStatus => {
-    const isCorrectOption = optionText === foodItem.name_en;
-
+    // Relies on selectedAnswer from App.tsx to determine state before feedback phase
+    // During feedback phase (showFeedback=true), options are hidden, so this logic is mostly for active play.
     if (imageStatus === 'loading') {
       return 'DISABLED_LOADING';
     }
-
-    if (showFeedback) { 
-      if (optionText === selectedAnswer) { 
-        return isAnswerCorrect ? 'FEEDBACK_CORRECT_SELECTED' : 'FEEDBACK_INCORRECT_SELECTED';
-      } else { 
-        return isCorrectOption ? 'FEEDBACK_REVEALED_CORRECT' : 'FEEDBACK_REVEALED_NEUTRAL';
-      }
-    } else { 
-      if (optionText === selectedAnswer) {
+    if (optionText === selectedAnswer) { 
+        // If an answer is selected, it's marked as such.
+        // The actual correct/incorrect styling is handled by modal now.
+        // For the button itself, 'SELECTED_PENDING_FEEDBACK' is enough.
         return 'SELECTED_PENDING_FEEDBACK';
-      }
-      return 'DEFAULT';
     }
+    return 'DEFAULT';
   };
   
   const isOptionActuallyDisabled = (status: OptionButtonDisplayStatus): boolean => {
-    if (status === 'DISABLED_LOADING' || showFeedback) {
+    if (status === 'DISABLED_LOADING' || showFeedback) { // Options hidden/disabled in feedback
         return true;
     }
-    return status === 'SELECTED_PENDING_FEEDBACK'; 
+    // Disable all options once any answer is selected, even before global feedback state from App
+    return selectedAnswer !== null; 
   };
 
   const handleNextWordClick = () => {
@@ -109,68 +104,73 @@ const MultipleChoiceScreen: React.FC<MultipleChoiceScreenProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col items-center space-y-2 sm:space-y-2.5 md:space-y-3 animate-fadeIn">
-      <div className="w-full flex justify-between items-center text-slate-700 font-semibold">
-        <span className="text-[10px] sm:text-xs md:text-sm bg-sky-200 px-2 sm:px-3 py-1 rounded-full shadow">Score: {score}</span>
-        <span className="text-[10px] sm:text-xs md:text-sm bg-amber-200 px-2 sm:px-3 py-1 rounded-full shadow">Question: {currentQuestion} / {totalQuestions}</span>
+    <div className="w-100 d-flex flex-column align-items-center gap-2 gap-sm-3 animate-fadeIn">
+      <div className="row w-100 fw-semibold align-items-center">
+        <div className="col text-start">
+          <span className="badge bg-info text-dark fs-6 px-2 px-sm-3 py-1 shadow-sm">Score: {score}</span>
+        </div>
+        <div className="col text-end">
+          <span className="badge bg-warning text-dark fs-6 px-2 px-sm-3 py-1 shadow-sm">Question: {currentQuestion} / {totalQuestions}</span>
+        </div>
       </div>
       
-      <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-purple-600 drop-shadow-md text-center">
+      <h2 className="h4 fw-bold text-secondary text-center mt-2">
         What is this?
       </h2>
       
-      <div className="relative w-full max-w-[280px] sm:max-w-xs h-28 sm:h-32 md:h-36 lg:h-40 rounded-xl shadow-2xl overflow-hidden group bg-slate-200 flex items-center justify-center">
+      <div 
+        className="position-relative w-100 rounded shadow-lg overflow-hidden bg-light d-flex align-items-center justify-content-center mx-auto"
+        style={{maxWidth: '320px', height: '180px'}} 
+      >
         {imageStatus === 'loading' && (
-          <p className="text-xs sm:text-sm text-slate-500 animate-pulse">Image loading...</p>
+          <div className="spinner-grow text-secondary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         )}
         {imageStatus === 'error' && (
-          <p className="text-xs sm:text-sm text-red-500">Could not load image.</p>
+          <p className="small text-danger m-0">Could not load image.</p>
         )}
         <img 
           src={currentImageSrc} 
           alt={foodItem.name_en} 
-          className={`w-full h-full object-contain transform transition-opacity duration-300 group-hover:scale-110 ${imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
+          className={`img-fluid object-fit-contain h-100 transition-opacity duration-300 ${imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
           onLoad={handleImageLoad}
           onError={handleImageError}
-          loading="lazy"
           key={foodItem.id} 
         />
-        {imageStatus === 'loaded' && <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>}
       </div>
 
-      <div className="grid grid-cols-2 gap-2 md:gap-3 w-full mt-1.5 sm:mt-2">
-        {options.map((option) => {
-          const displayStatus = getOptionDisplayStatus(option);
-          let actuallyDisabled = displayStatus === 'DISABLED_LOADING' || showFeedback;
-          if (!showFeedback && selectedAnswer !== null) { 
-            actuallyDisabled = true;
-          }
+      {!showFeedback && (
+        <div className="row g-2 g-md-3 w-100 mx-auto mt-2" style={{maxWidth: '320px'}}>
+          {options.map((option) => {
+            const displayStatus = getOptionDisplayStatus(option);
+            const actuallyDisabled = isOptionActuallyDisabled(displayStatus);
 
-          return (
-            <OptionButton
-              key={option}
-              optionText={option}
-              onClick={() => onSelectOption(option)}
-              displayStatus={displayStatus}
-              isActuallyDisabled={actuallyDisabled}
-            />
-          );
-        })}
-      </div>
+            return (
+              <div className="col-6" key={option}>
+                <OptionButton
+                  optionText={option}
+                  onClick={() => onSelectOption(option)}
+                  displayStatus={displayStatus}
+                  isActuallyDisabled={actuallyDisabled}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
       
-      {showFeedback && isAnswerCorrect !== null && (
-        <div className="mt-1.5 sm:mt-2 w-full flex flex-col items-center space-y-2 sm:space-y-3">
-            <FeedbackIndicator isCorrect={isAnswerCorrect} correctAnswer={foodItem.name_en} />
-            {proceedToNextQuestion && (
-                 <button
-                    type="button"
-                    onClick={handleNextWordClick}
-                    onMouseEnter={() => handleButtonHover(false)}
-                    className="px-4 py-1 bg-green-500 hover:bg-green-600 text-white text-[10px] sm:text-xs md:text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-300"
-                  >
-                    Next Word 🚀
-                  </button>
-            )}
+      {showFeedback && proceedToNextQuestion && (
+        <div className="mt-3 w-100 mx-auto d-flex flex-column align-items-center gap-2" style={{maxWidth: '320px'}}>
+            {/* FeedbackIndicator removed, modal shows this info */}
+            <button
+                type="button"
+                onClick={handleNextWordClick}
+                onMouseEnter={() => handleButtonHover(false)}
+                className="btn btn-success shadow-sm btn-lg" // Made button larger
+            >
+                Next Word 🚀
+            </button>
         </div>
       )}
     </div>
@@ -178,4 +178,3 @@ const MultipleChoiceScreen: React.FC<MultipleChoiceScreenProps> = ({
 };
 
 export default MultipleChoiceScreen;
-    
